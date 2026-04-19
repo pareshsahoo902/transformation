@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Health Command Center</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Load a nice sans-serif font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Sticky Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <h1 class="logo">Daily<span class="text-accent">Dash</span></h1>
+            <div class="date-nav">
+                <button id="prev-date" class="icon-btn" aria-label="Previous Day">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button id="current-date-btn" class="date-display">Today, Oct 12</button>
+                <input type="date" id="date-picker" class="hidden-date-picker">
+                <button id="next-date" class="icon-btn" aria-label="Next Day">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Container -->
+    <main class="dashboard-container">
+
+        <!-- Hero Summary -->
+        <section id="hero-section" class="section card hero-card glass">
+            <div class="hero-header">
+                <div>
+                    <h2 class="greeting" id="hero-greeting">Ready to crush it?</h2>
+                    <p class="insight-text text-secondary" id="hero-insight">Let's check your progress.</p>
+                </div>
+                <div class="daily-score-ring">
+                    <svg viewBox="0 0 36 36" class="circular-chart accent">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" id="score-ring-path" />
+                        <text x="18" y="20.35" class="percentage" id="hero-score-val">0</text>
+                    </svg>
+                    <span class="score-label">Score</span>
+                </div>
+            </div>
+
+            <div class="hero-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Calories</span>
+                    <span class="metric-value"><span id="hero-cal-val">0</span> <small class="text-secondary">/ <span id="hero-cal-target">1800</span></small></span>
+                    <div class="progress-bar-bg"><div class="progress-bar fill-accent" id="hero-cal-bar" style="width: 0%"></div></div>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Protein</span>
+                    <span class="metric-value"><span id="hero-pro-val">0</span>g <small class="text-secondary">/ <span id="hero-pro-target">160</span>g</small></span>
+                    <div class="progress-bar-bg"><div class="progress-bar fill-accent" id="hero-pro-bar" style="width: 0%"></div></div>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid-layout">
+            <!-- Macros Section -->
+            <section id="macros-section" class="section card">
+                <div class="section-header">
+                    <h3>Macros</h3>
+                    <button class="btn-text text-accent" onclick="app.ui.openPanel('add-macro')">+ Add Food</button>
+                </div>
+                <div class="macro-grid" id="macro-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- Meals Section -->
+            <section id="meals-section" class="section card">
+                <div class="section-header">
+                    <h3>Meals</h3>
+                    <button class="btn-text text-accent" onclick="app.ui.openPanel('add-meal')">+ Log</button>
+                </div>
+                <div class="meal-list" id="meal-list">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- Workouts Section -->
+            <section id="workouts-section" class="section card">
+                <div class="section-header">
+                    <h3>Workout</h3>
+                    <button class="btn-text text-accent" onclick="app.ui.openPanel('log-workout')">+ Log</button>
+                </div>
+                <div id="workout-content">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- Supplements Section -->
+            <section id="supplements-section" class="section card">
+                <div class="section-header">
+                    <h3>Supplements</h3>
+                </div>
+                <div class="supplement-list" id="supplement-list">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- Water & Habits Section -->
+            <section id="habits-section" class="section card">
+                <div class="section-header">
+                    <h3>Water & Habits</h3>
+                </div>
+
+                <div class="water-tracker">
+                    <div class="water-info">
+                        <span class="water-val"><span id="water-current">0</span><small>L</small></span>
+                        <span class="water-target text-secondary">/ <span id="water-target-val">3.5</span>L</span>
+                    </div>
+                    <div class="water-actions">
+                        <button class="btn-icon-circle" onclick="app.actions.addWater(0.25)">+250ml</button>
+                        <button class="btn-icon-circle" onclick="app.actions.addWater(0.5)">+500ml</button>
+                    </div>
+                </div>
+                <div class="progress-bar-bg mt-2"><div class="progress-bar fill-accent" id="water-bar" style="width: 0%"></div></div>
+
+                <div class="habit-list mt-4" id="habit-list">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- Progress & Charts Section -->
+            <section id="progress-section" class="section card span-full">
+                <div class="section-header" style="flex-wrap: wrap; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <h3>Trends (7 Days)</h3>
+                        <button class="btn-text text-accent" onclick="app.ui.openPanel('log-weight')">+ Log Weight</button>
+                    </div>
+                    <div class="chart-tabs">
+                        <button class="tab-btn active" data-chart="weight">Weight</button>
+                        <button class="tab-btn" data-chart="calories">Calories</button>
+                        <button class="tab-btn" data-chart="protein">Protein</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="trend-chart" width="400" height="200"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <!-- Settings button at bottom -->
+        <div class="bottom-actions">
+            <button class="btn-outline w-full" onclick="app.ui.openPanel('settings')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                Dashboard Settings
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Slide-over Panel (Right Drawer) -->
+    <div id="slide-panel-overlay" class="panel-overlay hidden">
+        <div id="slide-panel" class="slide-panel">
+            <div class="panel-header">
+                <h3 id="panel-title">Panel Title</h3>
+                <button class="icon-btn" onclick="app.ui.closePanel()" aria-label="Close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="panel-content" id="panel-content">
+                <!-- Dynamic Content Injected Here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
