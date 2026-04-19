@@ -5,12 +5,20 @@
 // Application State
 const app = {
     state: {
-        currentDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+        currentDate: "", // Initialized in initApp
         data: null // Holds the entire loaded data structure
     },
     ui: {},
     actions: {},
     utils: {}
+};
+
+// Utils: Date handling timezone-safe
+app.utils.getLocalISODate = function(dateObj = new Date()) {
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 };
 
 // Default Sample Data (Seeded on first load)
@@ -56,7 +64,7 @@ function generateHistoricalData() {
     for (let i = 6; i >= 0; i--) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);
-        const dateStr = d.toISOString().split('T')[0];
+        const dateStr = app.utils.getLocalISODate(d);
 
         // Randomize slight variations
         const calVar = Math.floor(Math.random() * 300) - 100; // -100 to +200
@@ -484,7 +492,7 @@ app.actions.handleFormSubmit = function(e) {
 app.actions.resetData = function() {
     if (confirm("Are you sure you want to reset all data? This cannot be undone.")) {
         app.utils.initDefaults();
-        app.state.currentDate = new Date().toISOString().split('T')[0];
+        app.state.currentDate = app.utils.getLocalISODate();
         app.ui.updateDateDisplay();
         app.ui.closePanel();
         app.ui.showToast("Data reset to defaults");
@@ -508,18 +516,22 @@ app.ui.setupPanelListeners = function() {
 // === UI & Navigation Logic ===
 
 app.ui.formatDate = function(dateStr) {
-    const date = new Date(dateStr);
-    const today = new Date().toISOString().split('T')[0];
+    // Avoid parsing 'YYYY-MM-DD' directly with new Date() as it assumes UTC and may shift the day.
+    // We split and construct locally.
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+
+    const today = app.utils.getLocalISODate();
 
     if (dateStr === today) return "Today, " + date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    if (dateStr === tomorrow.toISOString().split('T')[0]) return "Tomorrow, " + date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    if (dateStr === app.utils.getLocalISODate(tomorrow)) return "Tomorrow, " + date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    if (dateStr === yesterday.toISOString().split('T')[0]) return "Yesterday, " + date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    if (dateStr === app.utils.getLocalISODate(yesterday)) return "Yesterday, " + date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
     return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 };
@@ -536,9 +548,10 @@ app.ui.updateDateDisplay = function() {
 };
 
 app.actions.changeDate = function(offset) {
-    const current = new Date(app.state.currentDate);
+    const [year, month, day] = app.state.currentDate.split('-').map(Number);
+    const current = new Date(year, month - 1, day);
     current.setDate(current.getDate() + offset);
-    const newDateStr = current.toISOString().split('T')[0];
+    const newDateStr = app.utils.getLocalISODate(current);
 
     app.state.currentDate = newDateStr;
 
@@ -926,10 +939,6 @@ app.ui.renderCharts = function() {
     canvas.width = rect.width * dpr;
     canvas.height = 200 * dpr;
 
-    // Ensure CSS size remains accurate to layout
-    canvas.style.width = `${rect.width}px`;
-    canvas.style.height = `200px`;
-
     // Normalize coordinate system to use css pixels.
     ctx.scale(dpr, dpr);
 
@@ -1079,6 +1088,7 @@ app.utils.escapeHTML = function(str) {
 
 // === Initialize App ===
 function initApp() {
+    app.state.currentDate = app.utils.getLocalISODate();
     app.utils.loadData();
     app.ui.setupNavigationListeners();
     app.ui.setupPanelListeners();
