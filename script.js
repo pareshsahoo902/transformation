@@ -926,6 +926,10 @@ app.ui.renderCharts = function() {
     canvas.width = rect.width * dpr;
     canvas.height = 200 * dpr;
 
+    // Ensure CSS size remains accurate to layout
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `200px`;
+
     // Normalize coordinate system to use css pixels.
     ctx.scale(dpr, dpr);
 
@@ -1032,8 +1036,18 @@ app.ui.renderCharts = function() {
     ctx.font = '10px Inter, sans-serif';
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
-    ctx.fillText(Math.round(maxVal).toString(), paddingX - 8, paddingY);
-    ctx.fillText(Math.round(minVal).toString(), paddingX - 8, height - paddingY);
+
+    let maxLabel = Math.round(maxVal).toString();
+    let minLabel = Math.round(minVal).toString();
+
+    // If the rounded labels are identical (e.g. 94 and 94), show one decimal place to differentiate
+    if (maxLabel === minLabel) {
+        maxLabel = maxVal.toFixed(1);
+        minLabel = minVal.toFixed(1);
+    }
+
+    ctx.fillText(maxLabel, paddingX - 8, paddingY);
+    ctx.fillText(minLabel, paddingX - 8, height - paddingY);
 
     // Draw X-Axis Labels (Dates)
     ctx.textAlign = 'center';
